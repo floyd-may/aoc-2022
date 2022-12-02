@@ -2,10 +2,10 @@
 open System.IO
 open FParsec
 
-let private nl = pchar '\n'
+let private nl = skipChar '\n'
 
 let private pElf =
-    manyTill (pint32 .>> nl) nl
+    manyTill (pint32 .>> nl) (attempt eof <|> nl)
 
 let pElves =
     let fileLines = File.ReadAllLines "./day1.txt"
