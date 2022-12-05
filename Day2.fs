@@ -62,16 +62,17 @@ let private scoreRound r =
 let private pRound = 
     (pOpponent .>> spaces) .>>. pResponse .>> (nl <|> eof)
     
-let private parseFile =
+let private parseFile = lazy (
     let fileLines = File.ReadAllLines "./day2.txt"
     let fileContents = System.String.Join ("\n", fileLines)
     
     match run (manyTill pRound eof) fileContents with
     | Success (result, _, _) -> result
     | Failure (errorMsg, _, _) -> failwithf $"parse fail: %s{errorMsg}"
+)
     
 let part1 =
-    let rounds = parseFile
+    let rounds = parseFile.Force()
     
     let decodedRounds =
         rounds
@@ -92,7 +93,7 @@ let private decodeRound r =
     | (Paper, Z) -> (Paper, Scissors)
     | (Scissors, Z) -> (Scissors, Rock)
 let part2 =
-    let rounds = parseFile
+    let rounds = parseFile.Force()
     
     let decodedRounds =
         rounds
