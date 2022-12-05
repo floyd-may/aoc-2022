@@ -12,7 +12,6 @@ type Instruction = {
 
 let private nl = skipChar '\n'
 let private skipSingleSpace = skipChar ' '
-let private skipSpaces = many (skipSingleSpace)
 let private parseBlank = pstring "   " >>. preturn None
 
 let private parseCrate =
