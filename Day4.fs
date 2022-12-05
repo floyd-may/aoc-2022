@@ -3,6 +3,7 @@
 open System
 open System.IO
 open FParsec
+open ParsingUtils
 
 type Assignment = {
     Start: int
@@ -20,9 +21,7 @@ let parseLine line =
     
     let rawParser = pStart .>>. parseAssignment
     
-    match run rawParser line with
-    | Success (res, _, _) -> res
-    | Failure (msg, _, _) -> failwithf $"Parse fail: %s{msg}"
+    runParser rawParser line
 
 let contains x y =
     x.Start <= y.Start && x.End >= y.End

@@ -5,6 +5,7 @@ open Xunit
 open FsUnit.Xunit
 open FParsec
 open aoc_2022.Day5
+open ParsingUtils
 
 [<Fact>]
 let ``pivots crates``() =
@@ -25,7 +26,7 @@ let ``pivots crates``() =
         ]
         |> Map.ofList
     
-    pivotCrates crates |> should equal expected
+    parsing.pivotCrates crates |> should equal expected
 
 [<Fact>]
 let ``parses file``() =
@@ -56,9 +57,6 @@ let ``parses file``() =
         "move 1 from 1 to 2";
     ])
     
-    let actual =
-        match run parseAll fileContents with
-        | Success (x, _, _) -> x
-        | Failure (msg, _, _) -> failwithf $"parse fail: %s{msg}"
+    let actual = runParser parsing.parseAll fileContents
     
     actual |> should equal expected

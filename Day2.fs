@@ -1,8 +1,7 @@
 ﻿module aoc_2022.Day2
 open System.IO
 open FParsec
-
-let private nl = skipChar '\n'
+open ParsingUtils
 
 type private OpponentChoice =
     | A
@@ -66,9 +65,7 @@ let private parseFile = lazy (
     let fileLines = File.ReadAllLines "./day2.txt"
     let fileContents = System.String.Join ("\n", fileLines)
     
-    match run (manyTill pRound eof) fileContents with
-    | Success (result, _, _) -> result
-    | Failure (errorMsg, _, _) -> failwithf $"parse fail: %s{errorMsg}"
+    runParser (manyTill pRound eof) fileContents
 )
     
 let part1 =
