@@ -17,6 +17,8 @@
     <Compile Include="Day4Tests.fs" />
     <Compile Include="Day5.fs" />
     <Compile Include="Day5Tests.fs" />
+    <Compile Include="Day6.fs" />
+    <Compile Include="Day6Tests.fs" />
     <Compile Include="Program.fs" />
     <Content Include=".gitignore" />
   </ItemGroup>

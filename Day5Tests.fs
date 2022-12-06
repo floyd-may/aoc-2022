@@ -3,7 +3,6 @@
 open System
 open Xunit
 open FsUnit.Xunit
-open FParsec
 open aoc_2022.Day5
 open ParsingUtils
 
