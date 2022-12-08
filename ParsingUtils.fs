@@ -15,3 +15,7 @@ let runParser parser input =
     | Success (result, _, _) -> result
     | Failure (msg, _, _) -> failwithf $"Parse fail: %s{msg}"
     
+let runParserWithState parser input initialState =
+    match runParserOnString parser initialState "input" input with
+    | Success (result, _, _) -> result
+    | Failure (msg, _, _) -> failwithf $"Parse fail: %s{msg}"
