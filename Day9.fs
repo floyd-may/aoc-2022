@@ -51,13 +51,15 @@ let moveTail head tail =
     (*
     Tail at point B;
     Head will be at one of the points here:
-    points w,x,y,z are only relevant to part 2
     
     w 1 2 3 x
     4 5 6 7 8
     9 A B C D
     E F G H I
-    y J K L rz
+    y J K L z
+    
+    points w,x,y,z are only relevant to part 2,
+    and are impossible in part 1
     *)
     
     if (abs deltaX > 1) && (abs deltaY > 1)
