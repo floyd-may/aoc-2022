@@ -35,3 +35,9 @@ let ``path finding`` () =
     let pathLength = findPath startState
     
     pathLength |> should equal 31
+
+[<Fact>]
+let ``part2 example`` () =
+    let result = part2core sampleInput
+    
+    result |> should equal 29
