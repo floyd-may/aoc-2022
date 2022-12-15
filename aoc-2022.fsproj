@@ -29,12 +29,15 @@
     <Compile Include="Day10Tests.fs" />
     <Compile Include="Day11.fs" />
     <Compile Include="Day11Tests.fs" />
-    <Compile Include="Program.fs" />
     <Content Include=".gitignore" />
+    <Compile Include="Day12.fs" />
+    <Compile Include="Day12Tests.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FParsec" Version="1.1.1" />
+    <PackageReference Include="FSharpx.Collections" Version="3.1.0" />
     <PackageReference Include="FSUnit.Xunit" Version="5.1.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
     <PackageReference Include="XUnit" Version="2.4.2" />
