@@ -35,3 +35,6 @@ printfn $"Day 11, part 2: %s{Day11.part2()}"
 
 printfn $"Day 12, part 1: %s{Day12.part1()}"
 printfn $"Day 12, part 2: %s{Day12.part2()}"
+
+printfn $"Day 13, part 1: %s{Day13.part1()}"
+//printfn $"Day 13, part 2: %s{Day13.part2()}"
