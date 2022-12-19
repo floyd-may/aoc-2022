@@ -1,5 +1,6 @@
 ﻿module aoc_2022.Day15
 
+open OrderedRanges
 type Coord = int * int
 
 let distance a b =
@@ -10,31 +11,13 @@ let distance a b =
     +
     (abs (y1 - y2))
     
-type Range = {
-    Start: int
-    End: int
-}
-
-type OrderedRanges = Range list
-module OrderedRanges =
-    let rec add r rs =
-        match rs with
-        | [] -> [r]
-        | _ ->
-        let left, right =
-            rs
-            |> List.partition (fun x -> x.End < r.Start)
-        
-        left @ (r :: right)
-
-    
 type Sensor = {
     Loc: Coord
     Beacon: Coord
 }
 
 module Sensor =
-    let excludedPositionsForRow sensor row =
+    let private excludedRowRange sensor row =
         let dist = distance sensor.Loc sensor.Beacon
         let x,y = sensor.Loc
         let rowDist = abs (y - row)
@@ -43,8 +26,31 @@ module Sensor =
         let xStart = x - xRange
         let xEnd = x + xRange
         
-        seq { xStart..xEnd }
-        |> Seq.map (fun rangeX -> (rangeX, row))
+        xStart, xEnd
+        
+    let nonBeaconLocationsForRow sensor row =
+        let xStart, xEnd = excludedRowRange sensor row
+        
+        if xStart > xEnd then []
+        else
+        
+        if snd sensor.Beacon = row
+        then
+            let xBeacon = fst sensor.Beacon
+            [
+                { Start = xStart; End = xBeacon - 1 };
+                { Start = xBeacon + 1; End = xEnd };
+            ]
+            |> List.filter Range.valid
+        else
+            [{ Start = xStart; End = xEnd }]
+            
+    let excludedLocationsForRow sensor row = 
+        let xStart, xEnd = excludedRowRange sensor row
+        
+        if xStart > xEnd
+        then None
+        else { Start = xStart; End = xEnd } |> Some
 
 
 module Parsing =
@@ -72,20 +78,12 @@ let part1core input target =
     let sensors =
         input
         |> List.map Parsing.parseLine
-        
-        
-    let beacons =
-        sensors
-        |> List.map (fun x -> x.Beacon)
-        |> Set.ofSeq
-        
-    let beaconExists x = Set.contains x beacons
     
     sensors
-    |> Seq.collect (fun x -> Sensor.excludedPositionsForRow x target)
-    |> Seq.filter (beaconExists >> not)
-    |> Seq.distinct
-    |> Seq.length
+    |> Seq.collect (fun x -> Sensor.nonBeaconLocationsForRow x target)
+    |> Seq.fold (fun ranges r -> OrderedRanges.add r ranges) []
+    |> Seq.map Range.size
+    |> Seq.sum
 
 let part1 () =
     let lines =
@@ -93,4 +91,54 @@ let part1 () =
         |> List.ofSeq
         
     part1core lines 2000000
+    |> string
+
+let part2core input maxCoord =
+    let sensors =
+        input
+        |> List.map Parsing.parseLine
+        
+    let getRowRanges r =
+        sensors
+        |> Seq.map (fun x -> Sensor.excludedLocationsForRow x r)
+        |> Seq.collect Option.toList
+        |> Seq.fold (fun rs r -> OrderedRanges.add r rs) []
+        
+    let tryGetBeaconLoc indexedRow =
+        let y, ranges = indexedRow
+        
+        let isRelevant r =
+            r.End > 0 || r.Start < maxCoord
+        
+        let filteredRanges =
+            ranges
+            |> List.filter isRelevant
+            
+        match filteredRanges with
+        | [x] when x.Start = 1 -> (0, y) |> Some
+        | [x] when x.End = maxCoord - 1 -> (maxCoord, y) |> Some
+        | [left; right] -> (left.End + 1, y) |> Some
+        | _ -> None
+    
+    let rows =
+        seq { 0..maxCoord }
+        |> Seq.map getRowRanges
+        |> Seq.indexed
+        
+    let loc =
+        rows
+        |> Seq.map tryGetBeaconLoc
+        |> Seq.find Option.isSome
+        |> Option.get
+
+    let solnX, solnY = loc
+    
+    (solnX |> int64) * 4000000L + (solnY |> int64)
+    
+let part2 () =
+    let lines =
+        System.IO.File.ReadAllLines("./day15.txt")
+        |> List.ofSeq
+        
+    part2core lines 4000000
     |> string

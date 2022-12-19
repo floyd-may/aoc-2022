@@ -4,6 +4,7 @@ open Xunit
 open FsUnit.Xunit
 
 open Day15
+open OrderedRanges
 
 [<Fact>]
 let ``excluded positions for row``() =
@@ -13,19 +14,24 @@ let ``excluded positions for row``() =
     }
     
     let result =
-        Sensor.excludedPositionsForRow sensor 12
-        |> List.ofSeq
+        Sensor.nonBeaconLocationsForRow sensor 12
     
     result |> should equal [
-        (4, 12);
-        (5, 12);
-        (6, 12);
-        (7, 12);
-        (8, 12);
-        (9, 12);
-        (10, 12);
-        (11, 12);
-        (12, 12);
+        { Start = 4; End = 12 }
+    ]
+    
+[<Fact>]
+let ``excluded positions for row with beacon``() =
+    let sensor = {
+        Loc = (8, 7)
+        Beacon = 2, 10
+    }
+    
+    let result =
+        Sensor.nonBeaconLocationsForRow sensor 10
+    
+    result |> should equal [
+        { Start = 3; End = 14 }
     ]
 
 let sampleInput = [
@@ -50,3 +56,23 @@ let ``part 1 sample input``() =
     let result = part1core sampleInput 10
     
     result |> should equal 26
+    
+[<Fact>]
+let ``part 2 sample input``() =
+    let result = part2core sampleInput 20
+    
+    result |> should equal 56000011
+
+[<Fact>]
+let ``part2 merge ranges row 0``() =
+    let sensors =
+        sampleInput
+        |> List.map Parsing.parseLine
+        
+    let result =
+        sensors
+        |> Seq.map (fun x -> Sensor.excludedLocationsForRow x 0)
+        |> Seq.collect Option.toList
+        |> Seq.fold (fun rs r -> OrderedRanges.add r rs) []
+        
+    result |> should equal [{ Start = -8; End = 26 }]

@@ -18,6 +18,10 @@ module Range =
         let endVal = max a.End b.End
         
         { Start = start; End = endVal }
+        
+    let valid r = r.Start <= r.End
+    
+    let size r = r.End - r.Start + 1
 
 type OrderedRanges = Range list
 
@@ -31,9 +35,5 @@ module OrderedRanges =
         | [a] ->
             let left, right = Range.order a r
             [left; right]
-        | _ ->
-        let left, right =
-            rs
-            |> List.partition (fun x -> x.End + 1 < r.Start)
-        
-        left @ (add r right)
+        | a :: rest ->
+            a :: (add r rest)
