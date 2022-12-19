@@ -36,6 +36,10 @@
     <Compile Include="Day13Tests.fs" />
     <Compile Include="Day14.fs" />
     <Compile Include="Day14Tests.fs" />
+    <Compile Include="OrderedRanges.fs" />
+    <Compile Include="OrderedRangesTests.fs" />
+    <Compile Include="Day15.fs" />
+    <Compile Include="Day15Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

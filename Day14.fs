@@ -5,6 +5,11 @@ open ParsingUtils
 
 type Coord = int * int
 
+type RestingPlaceResult =
+    | Resting
+    | FallingIntoVoid
+    | Indeterminate
+
 let pairToLine pair: Coord seq =
     let (x1, y1), (x2, y2) = pair
     
@@ -39,9 +44,11 @@ let parseLine line: Coord list =
     |> Seq.collect pairToLine
     |> List.ofSeq
     
-let rec getSandPath usedCoords yMax path coord =
-    if snd coord = yMax then Result.Error (coord :: path)
-    else
+let rec getRestingPlace usedCoords baseCase coord: Coord option =
+    match baseCase coord with
+    | Resting -> Some coord
+    | FallingIntoVoid -> None
+    | _ ->
         
     let x,y = coord
     let candidates =
@@ -58,15 +65,8 @@ let rec getSandPath usedCoords yMax path coord =
         |> List.tryFind (isUsed >> not)
     
     match nextLoc with
-    | None -> Result.Ok (coord :: path)
-    | Some next -> getSandPath usedCoords yMax (coord :: path) next
-    
-let rec getRestingPlace usedCoords yMax coord =
-    let path = getSandPath usedCoords yMax [] coord
-        
-    match path with
-    | Result.Ok (res :: _) -> Some res
-    | _ -> None
+    | None -> Some coord
+    | Some next -> getRestingPlace usedCoords baseCase next
     
 let part1core input =
     let mutable usedCoords =
@@ -83,8 +83,13 @@ let part1core input =
 
     let mutable stop = false
     
+    let baseCase coord =
+        if snd coord = yMax
+        then FallingIntoVoid
+        else Indeterminate
+        
     while not stop do
-        let restingPlace = getRestingPlace usedCoords yMax (500,0)
+        let restingPlace = getRestingPlace usedCoords baseCase (500,0)
         
         match restingPlace with
         | None ->
@@ -111,32 +116,38 @@ let part2core input =
         |> Seq.collect parseLine
         |> Set.ofSeq
         
-        
     let yMax =
         usedCoords
         |> Seq.map snd
         |> Seq.max
-        
-    let floor =
-        ((-5000,yMax + 2),(5000,yMax + 2))
-        |> pairToLine
-        
-    usedCoords <-
-        floor
-        |> Seq.fold (fun acc x -> Set.add x acc) usedCoords
 
     let rockCoordCount = Set.count usedCoords
     let mutable stop = false
     
+    let baseCase coord =
+        if snd coord = yMax + 1
+        then Resting
+        else Indeterminate
+    
     while not stop do
-        let restingPlace = getRestingPlace usedCoords (yMax + 2) (500,0)
+        let restingPlace = getRestingPlace usedCoords baseCase (500,0)
         
         match restingPlace with
         | None ->
-            do stop <- true
+            failwith "unexpected falling into void case"
         | Some coord ->
             do usedCoords <-
                 usedCoords
                 |> Set.add coord
+            if coord = (500,0) then
+                do stop <- true
                 
     (Set.count usedCoords) - rockCoordCount
+    
+let part2 () =
+    let lines =
+        System.IO.File.ReadAllLines("./day14.txt")
+        |> List.ofSeq
+        
+    part2core lines
+    |> string
